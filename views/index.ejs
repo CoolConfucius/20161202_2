@@ -1,0 +1,96 @@
+<html>
+<head>
+  <title></title>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <script type ="text/javascript" src="/socket.io/socket.io.js"></script>
+  <script type ="text/javascript">
+  $(document).ready(function (){
+            // console.log("doc ready");
+            // this triggers the connection event in our server!
+            var socket = io.connect();
+            // we'll write all the socket stuff after the above line!
+            // $('button').click(function (){
+            //     socket.emit("button_clicked", {reason: "because I want to learn about sockets!"});
+            // });
+            // socket.on('server_response', function (data){
+            //     console.log('The server says: ' + data.response);
+            // });
+
+  $('form').submit(function(event){
+    event.preventDefault(); // stops the form from submitting! thus preventing refresh!!! 
+    var data = {};
+    data.yourname = $('#yourname').val();
+    data.dojolocation = $('#dojolocation').val();
+    data.favoritelanguage = $('#favoritelanguage').val();
+    data.comment = $('#comment').val();
+    console.log("data");
+    socket.emit("postingform", {message: data});
+
+    // var $message = $("<p>");
+    // $message.text('You emitted the following information to the server: ' + JSON.stringify(data));
+    // $('#messages').prepend($message);
+  });
+  socket.on('updatedmessage', function (data){
+    console.log(data);
+    var message = 'You emitted the following information to the server: ' + JSON.stringify(data.message);
+    console.log(message);
+    var $message = $("<p>");
+    $message.text(message);
+    $('#messages').append($message);
+  });
+
+  socket.on('randomnumber', function (data){
+    console.log(data);
+    var luckynumber = 'Your lucky number emitted by the server is: ' + data;
+    console.log(luckynumber);
+    var $luckynumber = $("<p>");
+    $luckynumber.text(luckynumber);
+    $('#messages').append($luckynumber);
+  });
+})
+</script>
+
+<style>
+form label, form input {
+  display: block;
+}
+</style>
+</head>
+<body>
+  <!-- <button>I AM A BUTTON!</button> -->
+  <!-- web page goes here -->
+  <div class="container">
+    <form action="">
+
+      <label>
+        Your Name: <input type="text" name="data.yourname" id="yourname">
+      </label>
+      <br>
+      <label>
+        Dojo Location: 
+        <select name="data.dojolocation" id="dojolocation">
+          <option value="Mountain View">Mountain View</option>
+          <option value="sanjose">San Jose</option>
+        </select>
+      </label>
+      <br>
+      <label>
+        Favorite Language: 
+        <select name="data.favoritelanguage" id="favoritelanguage">
+          <option value="javascript">Javascript</option>
+          <option value="python">Python</option>
+        </select>
+      </label>
+      <br>
+      <label for="comment">Comment (optional)</label>
+      <br>
+      <textarea name="data.comment" id="comment" cols="30" rows="10"></textarea>
+      <br>
+      <input type="submit" value="Submit">
+    </form>
+    <div id="messages">
+      <p></p>
+    </div>
+  </div>
+</body>
+</html>
